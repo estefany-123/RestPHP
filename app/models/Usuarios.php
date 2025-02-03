@@ -23,13 +23,23 @@ class Usuarios {
     public function login(){
         try{
 
-            if($server)
-            $this->db->query("SELECT * FROM usuarios WHERE documento = :documento AND contraseña = :contraseña");
+            if($_SERVER['REQUEST_METHOD'] === 'POST'){
+                $this->db->query("SELECT * FROM usuarios WHERE documento = :documento AND password = :password");
 
-            $this->db->bind(':documento',$datos['documento']);
-            $this->db->bind(':password',$datos['password']);
+                $this->db->bind(':documento',$_POST['documento']);
+                $this->db->bind(':password',$_POST['password']);
 
-            return  'Login exitoso';
+                $usuarios = $this->db->registros();
+                if(isset($usuarios[0])){
+                    return ['logged' => true, 'usuario' => $usuarios[0]];
+                }
+                else{
+                    return ['logged' => false];
+                }
+            }
+            else{
+                return false;
+            }
 
         }catch (PDOException $e) {
             error_log("Error al loguear el usuario: " . $e->getMessage());
